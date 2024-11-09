@@ -4,7 +4,7 @@ import {reactive, ref, watch,onBeforeMount} from "vue"
 import request from "@/utils/request"
 
 
-import {onLoad} from "@dcloudio/uni-app"
+import {onLoad,onShow} from "@dcloudio/uni-app"
 import countBox from "@/components/CountBox.vue"
 import UniRow from "../../uni_modules/uni-row/components/uni-row/uni-row.vue";
 import UText from "../../uni_modules/uview-plus/components/u--text/u--text.vue";
@@ -47,6 +47,13 @@ let cartListData = reactive({
 
 })
 
+function resetCartListData() {
+  cartListData.list = []
+  cartListData.totalProNum = 0
+  cartListData.totalPrice = 0
+  cartListData.isLastPage = false
+}
+
 let checkGroupBoolean = reactive([])
 
 async function getCartListData() {
@@ -80,10 +87,11 @@ function handleRadioCheckBooleanChange(value) {
 
 }
 
-onBeforeMount(async () => {
+onShow(async () => {
   console.log("onLoad")
   try {
     await getUserStore()
+    resetCartListData()
     await getCartListData()
     console.log('11111')
     handleRadioCheckBooleanChange(radioCheckBoolean.value);
@@ -112,7 +120,10 @@ watch(checkGroupBoolean,()=>{
       break;
     }
   }
-  radioCheckBoolean.value = boolean
+  if(checkGroupBoolean.length > 0){
+    radioCheckBoolean.value = boolean
+  }
+
 },{immediate:true})
 function changeRadio(){
   console.log("changeRadio")
