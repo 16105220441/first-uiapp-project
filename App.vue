@@ -11,6 +11,12 @@
 		onHide: function() {
 			console.log('App Hide')
 		},
+    onLoad() {
+        console.log('App Load')
+    },
+    onUnload() {
+        console.log('App Unload')
+    },
 		/* onReady:function(){
 			console.log('onReady')
 		} */

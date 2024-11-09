@@ -174,12 +174,12 @@
 				</uni-col>
 				<uni-col :span="6">
 
-					<uni-icons font-family="custom-icon" :size="30">{{`&#xe63f`}}</uni-icons>
-					<text>待收货</text>
+					<uni-icons class="custom-icon custom-icon-daifahuo" :size="30">{</uni-icons>
+					<text>待发货</text>
 				</uni-col>
 				<uni-col :span="6">
 
-					<uni-icons font-family="custom-icon" :size="30">{{`&#xe607;`}}</uni-icons>
+					<uni-icons class="custom-icon custom-icon-daishouhuo" :size="30"></uni-icons>
 					<text>待收货</text>
 				</uni-col>
 			</uni-row>
@@ -196,7 +196,8 @@
 							goToDeliveryAddress()
 						}
 					}">
-						<uni-icons font-family="custom-icon" :size="30" color="#ff0000" :class="item.classname" >
+						<uni-icons class="custom-icon" :size="30" color="#ff0000"
+                       :class="item.classname" >
 
 						</uni-icons>
 						<text>{{item.name}}</text>
@@ -215,7 +216,7 @@
 </template>
 
 <style lang="scss" scoped>
-	@import "@/static/iconFont/iconfont.css";
+	@import "../../static/iconFont/iconfont.css";
 
 	.page-container {
 		height: calc(100vh - 95px);

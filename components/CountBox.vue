@@ -1,10 +1,7 @@
 <script setup>
 	import {
 		ref,
-		computed,
-		watch,
-		onMounted,
-		onUnmounted,
+
 	} from "vue"
 	const props = defineProps({
 		value: {
@@ -12,6 +9,7 @@
 			default: 1
 		},
 		maxNum: {
+      default: 0,
 			type: Number
 		}
 	})
@@ -29,6 +27,7 @@
 
 	function clickAdd() {
 		countValue.value++
+
 		countValue.value =  Math.min(props.maxNum,countValue.value)
 		emits('updateValue', countValue.value)
 
@@ -40,7 +39,7 @@
 			console.log('filteredValue',filteredValue);
 			filteredValue = Math.min(props.maxNum, filteredValue)
 			return e = filteredValue;
-			
+
 		} else {
 			return ''
 		}
@@ -63,7 +62,7 @@
 
 		</u-button>
 		<u-input class="input" v-model="countValue" :formatter="onFormatter" @change="onChange"
-			style="padding: 0;text-align: center !important;"></u-input>
+			style="padding: 0;text-align: center !important;" inputAlign="center"></u-input>
 
 
 
@@ -86,7 +85,9 @@
 			line-height: 100%;
 			text-align: center;
 		}
-
+    .uni-input-input{
+      text-align: center !important;
+    }
 		.input {
 			width: 40px;
 			height: 30px;
