@@ -55,13 +55,20 @@ function resetCartListData() {
 }
 
 let checkGroupBoolean = reactive([])
-
-async function getCartListData() {
+let pageNum = ref(1)
+let isLastPage = ref(false)
+async function getCartListData(pageNumParam) {
 
   console.log('getCartListData')
-  let {data: {cartList}} = await request(`/cart/list?customerId=${userStore.userId}`, "GET")
+  let {data: {cartList}} = await
+      request(`/cart/list?customerId=${userStore.userId}&&pageNum=${pageNumParam}`, "GET")
   cartListData.totalProNum = cartList.total
   cartListData.isLastPage = cartList.isLastPage
+  if(!cartList.isLastPage){
+    pageNum.value++
+  }else{
+    isLastPage.value = true
+  }
   if (cartList.list !== null) {
     let list = cartList.list
 
@@ -90,11 +97,12 @@ function handleRadioCheckBooleanChange(value) {
 
 onShow(async () => {
   console.log("onLoad")
+  pageNum.value = 1
   try {
     await getUserStore()
     resetCartListData()
-    await getCartListData()
-    console.log('11111')
+    await getCartListData(pageNum.value)
+   /* console.log('11111')*/
     handleRadioCheckBooleanChange(radioCheckBoolean.value);
   } catch (error) {
 
@@ -176,6 +184,24 @@ function goToProDetail(productId){
 function updateCartItem(e,userId,detailId,index){
 
 }
+let timeoutId;
+
+function debounce(func, delay) {
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
+
+const debouncedHandleScroll = debounce(function() {
+  if (!isLastPage.value) {
+    getCartListData(pageNum.value);
+  }
+}, 300); // 设置300毫秒的防抖时间
+
+// 使用 debouncedHandleScroll 替代原有的 handleScroll
 </script>
 
 <template>
@@ -199,7 +225,7 @@ function updateCartItem(e,userId,detailId,index){
 
 
     <scroll-view class="cart-list" scroll-y="true"
-                 @scroll="console.log($event.detail)">
+                 @scroll="debouncedHandleScroll">
 
 
       <uni-swipe-action>
@@ -255,8 +281,7 @@ function updateCartItem(e,userId,detailId,index){
 
     </scroll-view>
 
-    <view class="page-fix-bottom"  v-if=" userStore !== null ||
-          cartListData.list.length  > 0">
+    <view class="page-fix-bottom"  v-if=" cartListData.list.length  > 0">
 
       <view class="left-container">
         <radio :checked="radioCheckBoolean" activeBackgroundColor="#c21401"
@@ -331,22 +356,31 @@ function updateCartItem(e,userId,detailId,index){
   border-radius: 10px;
 }
 
+
 .cart-item {
+  position: relative;
+  height:calc((102/375) *750rpx);
   padding: 0 10px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
 
   .product-preview {
+
     min-width: 77px;
     width: calc(77 / 375 * 750rpx);
     display: block;
     margin-left: 7px;
     margin-right: 14px;
 
+
+
   }
 
   .right {
+  width: 60%;
+   position: absolute;
+    right: 20px;
+    right: 20px;
     .price {
       color: #c21401;
     }
