@@ -1,6 +1,6 @@
 <script setup>
 
-import {reactive, ref, watch,onBeforeMount} from "vue"
+import {reactive, ref, watch, onBeforeMount, computed} from "vue"
 import request from "@/utils/request"
 
 
@@ -32,7 +32,7 @@ function getUserStore() {
       userStore = JSON.parse(uni.getStorageSync("userStore"))
       resolve(userStore);
     } catch (err) {
-      console.log(err)
+     userStore = null
       reject(err)
     }
   })
@@ -42,7 +42,7 @@ function getUserStore() {
 let cartListData = reactive({
   list: [],
   totalProNum: 0,
-  totalPrice: 0,
+  totalPrice: 0.00,
   isLastPage: false,
 
 })
@@ -50,13 +50,14 @@ let cartListData = reactive({
 function resetCartListData() {
   cartListData.list = []
   cartListData.totalProNum = 0
-  cartListData.totalPrice = 0
+ /* cartListData.totalPrice = 0.00*/
   cartListData.isLastPage = false
 }
 
 let checkGroupBoolean = reactive([])
 
 async function getCartListData() {
+
   console.log('getCartListData')
   let {data: {cartList}} = await request(`/cart/list?customerId=${userStore.userId}`, "GET")
   cartListData.totalProNum = cartList.total
@@ -69,23 +70,23 @@ async function getCartListData() {
       checkGroupBoolean.push({checkBoxBoolean: true})
     }
   }
-
-  cartListData.list.forEach(item => {
-    cartListData.totalPrice += item.itemTotalPrice; // 累加每个商品的总价
-  });
-  cartListData.totalPrice = cartListData.totalPrice.toFixed(2) // 保留两位小数
 }
 
 
 
+
+
+
 function handleRadioCheckBooleanChange(value) {
-  console.log('immediate');
+ /* console.log('immediate');*/
 
     for (let i = 0; i < checkGroupBoolean.length; i++) {
       checkGroupBoolean[i].checkBoxBoolean = !value;
     }
 
 }
+
+
 
 onShow(async () => {
   console.log("onLoad")
@@ -96,6 +97,7 @@ onShow(async () => {
     console.log('11111')
     handleRadioCheckBooleanChange(radioCheckBoolean.value);
   } catch (error) {
+
     console.log(error)
   }
 
@@ -103,31 +105,42 @@ onShow(async () => {
 let radioCheckBoolean = ref(true)
 function checkBox(index){
   checkGroupBoolean[index].checkBoxBoolean = !checkGroupBoolean[index].checkBoxBoolean
+  if(checkGroupBoolean[index].checkBoxBoolean){
+    radioCheckBoolean.value = false
+  }
 }
-
-
-watch(() => radioCheckBoolean.value, (newVal) => {
-  console.log("radioCheckBoolean")
-  handleRadioCheckBooleanChange(newVal);
-}, { immediate: true });
-
-watch(checkGroupBoolean,()=>{
-  console.log("checkGroupBoolean")
+let value
+   value = computed(()=>{
   let boolean = true
   for (let i = 0; i < checkGroupBoolean.length; i++){
     if(checkGroupBoolean[i].checkBoxBoolean){
       boolean = false
-      break;
+      break
     }
   }
-  if(checkGroupBoolean.length > 0){
-    radioCheckBoolean.value = boolean
+  if(boolean){
+    radioCheckBoolean.value = true
   }
+  return boolean
+})
 
-},{immediate:true})
+cartListData.totalPrice = computed(()=>{
+  let totalPrice = 0.00
+  for (let i = 0; i < checkGroupBoolean.length; i++){
+    if(i >= cartListData.list.length) {
+      break
+    }
+    if(!checkGroupBoolean[i].checkBoxBoolean){
+      totalPrice += cartListData.list[i].products.discountPrice * cartListData.list[i].quantity
+    }
+  }
+  return totalPrice.toFixed(2)
+})
+
 function changeRadio(){
   console.log("changeRadio")
   radioCheckBoolean.value = !radioCheckBoolean.value
+  handleRadioCheckBooleanChange(radioCheckBoolean.value )
 }
 
 async function deleteCartItem(index,delectItemNum,productId){
@@ -152,8 +165,15 @@ async function deleteCartItem(index,delectItemNum,productId){
   checkGroupBoolean.splice(index,delectItemNum)
   cartListData.list.splice(index,delectItemNum)
 
+}
+function goToProDetail(productId){
+  uni.navigateTo({
+    url: `/pages/prodetail/prodetail?productId=${productId}`
+  })
+}
 
 
+function updateCartItem(e,userId,detailId,index){
 
 }
 </script>
@@ -162,7 +182,8 @@ async function deleteCartItem(index,delectItemNum,productId){
 
 
   <view class="page-container">
-    <view class="empty-cart">
+    <view class="empty-cart" v-if="userStore === null ||
+    cartListData.list.length  <= 0">
       <image mode="" src="@/static/empty.png"></image>
       <view class="empty-cart-discripte is-login">
         <text>您的购物车是空的，快去逛逛吧</text>
@@ -177,14 +198,16 @@ async function deleteCartItem(index,delectItemNum,productId){
     </view>
 
 
-    <view class="cart-list">
+    <scroll-view class="cart-list" scroll-y="true"
+                 @scroll="console.log($event.detail)">
+
 
       <uni-swipe-action>
 
           <uni-swipe-action-item v-for="(item,index) in cartListData.list"
                                  :key="item.id" class="bottom-margin">
             <uni-row
-                class="cart-item">
+                class="cart-item" >
 
               <view class="check-box">
                 <u-checkbox ref="checkBoxRef" :usedAlone="true"
@@ -197,10 +220,10 @@ async function deleteCartItem(index,delectItemNum,productId){
               <image :src="item.products?.productImage" alt=""
                      class="product-preview"
                      mode="widthFix"
-                     srcset=""/>
+                     srcset="" @click="goToProDetail(item.productId)"/>
               <view class="right">
                 <view class="details">
-                  <u-text :lines="2" :text="item.products?.name"></u-text>
+                  <u-text :lines="2" :text="item.products?.name" @click="goToProDetail(item.productId)"></u-text>
 
                   <view class="bottom" style="margin-top: 10px">
                     <view class="price">
@@ -209,7 +232,9 @@ async function deleteCartItem(index,delectItemNum,productId){
                     </view>
                     <view class="count">
                       <count-box :maxNum="item.products?.stockTotal"
-                                 :value="item.quantity"></count-box>
+                                 v-model:value="item.quantity"
+                                 @updateValue="updateCartItem($event,userStore.userId
+,item.detailId,index)"></count-box>
                     </view>
                   </view>
                 </view>
@@ -228,9 +253,10 @@ async function deleteCartItem(index,delectItemNum,productId){
       </uni-swipe-action>
 
 
-    </view>
+    </scroll-view>
 
-    <view class="page-fix-bottom">
+    <view class="page-fix-bottom"  v-if=" userStore !== null ||
+          cartListData.list.length  > 0">
 
       <view class="left-container">
         <radio :checked="radioCheckBoolean" activeBackgroundColor="#c21401"
@@ -286,15 +312,19 @@ async function deleteCartItem(index,delectItemNum,productId){
     color: #fff;
   }
 }
-
+.cart-list{
+  height: 100%;
+  box-sizing: border-box;
+  padding: 20px 0 70px;
+}
 .cart-item:not(:last-child) {
-  padding-bottom: 10px;
+  padding-bottom: 20px;
 
 
 }
 
 .bottom-margin:not(:last-child) {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
 .bottom-margin {
