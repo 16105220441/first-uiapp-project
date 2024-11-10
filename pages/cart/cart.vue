@@ -153,7 +153,7 @@ function changeRadio(){
 
 async function deleteCartItem(index,delectItemNum,productId){
 
-  let res = new Promise((resolve,reject)=>{
+
     try {
       let deleteCartItemList = []
       deleteCartItemList.push({
@@ -162,17 +162,22 @@ async function deleteCartItem(index,delectItemNum,productId){
             userId
 
       })
-      resolve(request("/cartDetail/delete","POST",deleteCartItemList))
-
+      await request("/cartDetail/delete","POST",deleteCartItemList)
+      checkGroupBoolean.splice(index,delectItemNum)
+      cartListData.list.splice(index,delectItemNum)
+      return true
     }catch (err){
-     reject(err)
+     console.log(err)
     }
-  })
+}
+// 在使用 deleteCartItem 的函数中调用 updateCartCount
+async function handleDeleteItem(index, delectItemNum, productId) {
+  const deleteSuccess = await deleteCartItem(index, delectItemNum, productId);
 
-
-  checkGroupBoolean.splice(index,delectItemNum)
-  cartListData.list.splice(index,delectItemNum)
-
+  if (deleteSuccess) {
+    // 只有在删除成功后才更新购物车计数
+    await updateCartCount();
+  }
 }
 function goToProDetail(productId){
   uni.navigateTo({
@@ -201,6 +206,26 @@ const debouncedHandleScroll = debounce(function() {
   }
 }, 300); // 设置300毫秒的防抖时间
 
+async function updateCartCount() {
+  try {
+    const userId = JSON.parse(uni.getStorageSync("userStore")).userId;
+    const { data: cartTotalNum } = await request(`/cartDetail/get/cartProTotalNum?customerId=${userId}`, "GET");
+
+    uni.setStorageSync("ProNumToCart", JSON.stringify({ number: cartTotalNum }));
+    if(cartTotalNum !== 0){
+      uni.setTabBarBadge({ index: 2, text: cartTotalNum.toString() });
+    }else{
+      uni.removeTabBarBadge({ index: 2 });
+    }
+
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+onShow( async ()=>{
+  await updateCartCount()
+})
 // 使用 debouncedHandleScroll 替代原有的 handleScroll
 </script>
 
@@ -269,7 +294,7 @@ const debouncedHandleScroll = debounce(function() {
             <template v-slot:right>
               <view class="slot-button" >
                 <view class="slot-button-item"
-                      @click="deleteCartItem(index,1,item.products?.productId)">
+                      @click="handleDeleteItem(index,1,item.products?.productId)">
                   删除
                 </view>
 

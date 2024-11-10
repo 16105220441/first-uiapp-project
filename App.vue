@@ -1,22 +1,25 @@
 <script>
 
-	export default {
-		onLaunch: function() {
-			console.log('App Launch')
-			/* console.log('uviewPlus',uviewPlus) */
-		},
-		onShow: function() {
+	import request from "./utils/request";
+
+  export default {
+		onLaunch:  async function () {
+      console.log('App Launch')
+    },
+		onShow: async function() {
 			console.log('App Show')
+
+
 		},
+
+    mounted: async function() {
+      console.log('mounted')
+
+    },
 		onHide: function() {
 			console.log('App Hide')
 		},
-    onLoad() {
-        console.log('App Load')
-    },
-    onUnload() {
-        console.log('App Unload')
-    },
+
 		/* onReady:function(){
 			console.log('onReady')
 		} */

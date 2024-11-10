@@ -28,8 +28,8 @@
 	}
 	onLoad((e) => {
 		console.log(e)
-	 let ProStorge 
-		 
+	 let ProStorge
+
 		 try{
 			ProStorge = JSON.parse(uni.getStorageSync("ProNumToCart"))
 		 }catch(err){
@@ -38,7 +38,7 @@
 	 if(ProStorge){
 		 proNumToCartStorge.value = ProStorge.number
 	 }
-		
+
 		getProInfo(e.productId)
 		proId.value = e.productId
 		getComments()
@@ -121,20 +121,23 @@
 	/* 	console.log(uni.getStorageSync('ProNumToCart')=='') */
 	let proNumToCartStorge = ref(0)
 	let userInfo = ref(null)
-	
+
 	async function setProNumToCart() {
-		proNumToCartStorge.value = parseInt(proNumToCartStorge.value) + addCount.value
 
-		const userStore = JSON.parse(uni.getStorageSync("userStore"))
 
-	
+    const userStore = JSON.parse(uni.getStorageSync("userStore"))
+    let {data:boolean}= await
+        request(`/cartDetail/get/Info?customerId=${userStore.userId}&&productId=${proId.value}`,"GET")
+    if(!boolean){
+      proNumToCartStorge.value = parseInt(proNumToCartStorge.value) + addCount.value
+    }
 		    // 发起请求添加产品到购物车
 		    await request("/cartDetail/add/product", "POST", {
 		        productId: Number(proId.value),
-		        quantity: proNumToCartStorge.value,
+		        quantity:addCount.value,
 		        customerId: userStore.userId
 		    });
-		
+
 		    // 更新本地存储
 		    uni.setStorageSync('ProNumToCart', JSON.stringify({
 		        number: proNumToCartStorge.value
@@ -206,7 +209,7 @@
 		    userInfo.value = null; // 举例，假设你需要重置用户信息
 		}
 
-	
+
 	})
 </script>
 
@@ -293,7 +296,7 @@
 
 	<u-action-sheet :title="actionSheetTitle" :show="actionSheetShow" round="20px" :safeAreaInsetBottom="true"
 		@close="actionSheetShow = false">
-		<template v-slot="conten">
+		<template v-slot="content">
 			<view class="product">
 				<uni-row class="product-title" :gutter="20">
 					<uni-col :span="8" class="left">
@@ -329,7 +332,7 @@
 						  }else{
 							  summitBuyNow()
 						  }
-						  
+
 					  }" color="#fe5630">{{actionSheetTitle}}
 					</button>
 				</view>

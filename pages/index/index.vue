@@ -9,7 +9,7 @@
 
 	import {
 		onReachBottom,
-
+    onShow
 	} from "@dcloudio/uni-app"
 
 
@@ -79,6 +79,26 @@
 		if (!lastPageBoolean.value)
 			getProList()
 	})
+  async function updateCartCount() {
+    try {
+      const userId = JSON.parse(uni.getStorageSync("userStore")).userId;
+      const { data: cartTotalNum } = await request(`/cartDetail/get/cartProTotalNum?customerId=${userId}`, "GET");
+
+      uni.setStorageSync("ProNumToCart", JSON.stringify({ number: cartTotalNum }));
+      if(cartTotalNum !== 0){
+        uni.setTabBarBadge({ index: 2, text: cartTotalNum.toString() });
+      }else{
+        uni.removeTabBarBadge({ index: 2 });
+      }
+
+
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  onShow( async ()=>{
+    await updateCartCount()
+  })
 </script>
 
 <template>
