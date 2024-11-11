@@ -214,6 +214,7 @@
 </script>
 
 <template>
+
 	<view id="top" class="top">
 		<swiper :indicator-dots="true" indicator-active-color="#828282" indicator-color="#dcdcdc" :autoplay="true"
 			:interval="3000" :duration="1000" :circular="true">
@@ -390,7 +391,7 @@
 	}
 
 	.comments {
-		padding: 0 10px;
+		padding: 0 10px 55px;
 
 		.comments-body {
 			.uni-row {

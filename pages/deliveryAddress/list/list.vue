@@ -36,52 +36,53 @@
 	let current = ref(-1)
 
 	let isRequesting = false; // 定义一个标志来防止重复请求
-	
+
 	async function radioChange(e) {
 	    // 如果当前已有请求正在进行，直接返回，避免重复执行
 	    if (isRequesting) {
 	        return;
 	    }
-	
+
 	    // 设置请求状态为正在进行
 	    isRequesting = true;
-	
+
 	    // 获取选中项的值
 	    const { addressDetailId, customerId } = e.detail.value;
-	
+
 	    // 发送请求更新默认地址
 	    let { code } = await request("/address/detail/update/default", "PUT", {
 	        addressDetailId,
 	        customerId
 	    });
-	
+
 	    // 根据返回的 code 显示相应的消息框
 	    if (code === 200) {
+        uni.$off("backToPay")
 	        // 若成功，显示成功的提示框
 	        uni.showToast({
 	            title: "该收货地址成功设为默认地址", // 提示内容
 	            icon: "success", // 成功图标
 	            duration: 1500 // 显示时间
 	        });
-	
+
 	        // 使用 Promise 来等待消息提示框消失
 	        await new Promise((resolve) => {
 	            setTimeout(() => {
 	                resolve(); // 结束 Promise
 	            }, 1500); // 等待时间与提示框的 duration 相同
 	        });
-	
+
 	        // 在消息提示框消失后更新数据
 	        addressList.length = 0; // 清空现有地址列表
 	        await getAddressList(); // 重新获取地址列表
-	
+
 	        // 等待 1 秒钟
 	        await new Promise((resolve) => {
 	            setTimeout(resolve, 1000); // 等待 1 秒
 	        });
-	
+
 	        uni.navigateBack();
-	
+
 	    } else {
 	        // 若失败，显示失败的提示框
 	        uni.showToast({
@@ -90,7 +91,7 @@
 	            duration: 1500 // 显示时间
 	        });
 	    }
-	
+
 	    // 请求结束，重置状态
 	    isRequesting = false;
 	}
@@ -133,6 +134,12 @@
 		addressList.length = 0
 		getAddressList()
 	})
+  function goPayPage(params) {
+    uni.navigateBack()
+    uni.$emit("backToPay",{addressDetailId:params})
+  }
+
+
 </script>
 
 <template>
@@ -141,10 +148,10 @@
 		<radio-group @change="radioChange">
 
 			<uni-swipe-action>
-				<uni-swipe-action-item v-for="(item,index) in addressList" :key="index">
+				<uni-swipe-action-item v-for="(item,index) in addressList" :key="item.addressDetailId">
 					<uni-row class="address-list-item">
 						<radio class="radio" :value="item" :checked="index === current" />
-						<view class="address-info">
+						<view class="address-info" @click="goPayPage(item.addressDetailId)">
 							<view>
 								<uni-row>
 									<view class="name padding-block">
@@ -278,8 +285,8 @@ addressDetailId)">
 	}
 
 	.footer {
-		margin: 0 10px;
-		width: calc(100vw - 20px);
+		margin: 0 20px 15px;
+		width: calc(100vw - 40px);
 		position: fixed;
 		bottom: 0;
 

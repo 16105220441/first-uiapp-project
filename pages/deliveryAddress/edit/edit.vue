@@ -207,7 +207,7 @@
 
 			userInfo.customerId = JSON.parse(uni.getStorageSync("userStore")).userId
 			const resultArray = userInfo.Region.split(' ')
-			
+
 			console.log('resultArray', resultArray)
 			if (hasRouterParams.value) {
 				console.log('update')
