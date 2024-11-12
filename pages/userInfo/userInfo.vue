@@ -82,23 +82,26 @@
 	})
 	onShow(async ()=>{
 		console.log("onShow")
-		const res = await new Promise((resolve, reject) => {
+
 			uni.getStorage({
 				key: 'userStore',
-				success: (result) => {
-					resolve(result)
-				},
+				success: async (result) => {
+          const userData = JSON.parse(result.data)
+          if (userData.userToken) {
+            isLogin.value = true
+            await getUserBasicInfo(userData.userId)
+          }
+
+        },
 				fail: (error) => {
-					reject(error)
-				}
-			})
+          userBasicInfo.mobile = ''
+          userBasicInfo.pickName = ''
+          userBasicInfo.avatar = ''
+          uni.removeTabBarBadge({ index: 2 });
+
+        }
 		})
 
-		const userData = JSON.parse(res.data)
-		if (userData.userToken) {
-			isLogin.value = true
-			await getUserBasicInfo(userData.userId)
-		}
 	})
 	async function logout(){
 		isLogin.value = false

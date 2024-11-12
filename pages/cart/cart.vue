@@ -1,6 +1,6 @@
 <script setup>
 
-import {reactive, ref, watch, onBeforeMount, computed} from "vue"
+import {reactive, ref, watch, onBeforeMount,onMounted, computed} from "vue"
 import request from "@/utils/request"
 
 
@@ -30,8 +30,10 @@ function getUserStore() {
   return new Promise((resolve, reject) => {
     try {
       userStore = JSON.parse(uni.getStorageSync("userStore"))
+
       resolve(userStore);
     } catch (err) {
+
      userStore = null
       reject(err)
     }
@@ -50,7 +52,7 @@ let cartListData = reactive({
 function resetCartListData() {
   cartListData.list = []
   cartListData.totalProNum = 0
- /* cartListData.totalPrice = 0.00*/
+
   cartListData.isLastPage = false
 }
 
@@ -74,8 +76,15 @@ async function getCartListData(pageNumParam) {
 
     cartListData.list.push(...list[0].shoppingCartDetails)
     for (let i = 0; i < cartListData.list?.length; i++) {
-      checkGroupBoolean.push({checkBoxBoolean: true})
+      checkGroupBoolean[i] = {checkBoxBoolean: true}
     }
+  }
+}
+
+function initializeCheckGroup(cartListData) {
+
+  for (let i = 0; i < cartListData.list?.length; i++) {
+    checkGroupBoolean.push({checkBoxBoolean: true});
   }
 }
 
@@ -96,7 +105,7 @@ function handleRadioCheckBooleanChange(value) {
 
 
 onShow(async () => {
-  console.log("onLoad")
+  console.log("onShow")
   pageNum.value = 1
   try {
     await getUserStore()
@@ -104,7 +113,11 @@ onShow(async () => {
     await getCartListData(pageNum.value)
    /* console.log('11111')*/
     handleRadioCheckBooleanChange(radioCheckBoolean.value);
+    await updateCartCount()
   } catch (error) {
+
+    resetCartListData()
+    uni.removeTabBarBadge({ index: 2 });
 
     console.log(error)
   }
@@ -120,6 +133,7 @@ function checkBox(index){
 let value
    value = computed(()=>{
   let boolean = true
+     console.log('computed')
   for (let i = 0; i < checkGroupBoolean.length; i++){
     if(checkGroupBoolean[i].checkBoxBoolean){
       boolean = false
@@ -220,12 +234,11 @@ async function updateCartCount() {
 
 
   } catch (err) {
+    Object.assign(cartListData,{})
     console.log(err);
   }
 }
-onShow( async ()=>{
-  await updateCartCount()
-})
+
 // 使用 debouncedHandleScroll 替代原有的 handleScroll
 </script>
 

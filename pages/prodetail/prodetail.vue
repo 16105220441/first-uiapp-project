@@ -180,7 +180,7 @@
 	}
 
 	function summitBuyNow() {
-		if (userInfo.value !== '') {
+		if (userInfo.value !== '' && userInfo.value !== null) {
 			actionSheetShow.value = false
 			uni.navigateTo({
 				url: `/pages/pay/pay?productId=${proId.value}&&proNum=${addCount.value}`
@@ -306,7 +306,7 @@
 					<uni-col :span="16" class="right" style="text-align: left;">
 						<view class="price">
 							<text>￥</text>
-							<text class="nowPrice">{{ pro_detail.discountPrice }}</text>
+							<text class="nowPrice">{{pro_detail.discountPrice }}</text>
 						</view>
 						<view class="count">
 							<text>库存</text>
