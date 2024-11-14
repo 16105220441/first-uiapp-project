@@ -1,6 +1,6 @@
 const url_all = {
 	/* 'DEV':'http://192.168.72.249:8082' */ //开发
-	'DEV': 'http://192.168.20.239:8082',
+	'DEV': 'http://116.205.188.40:8082',
 	'PRO': '', //生产环境
 }
 
@@ -22,6 +22,8 @@ const request =  (path, method, data = {}, loading = true) => {
 			mask: true
 		})
 	}
+	console.log('request')
+	console.log('token',token)
 	if (token != '' && token != null) {
 		/* console.log('token',token)
 		console.log('method',method) */
@@ -34,8 +36,8 @@ const request =  (path, method, data = {}, loading = true) => {
 export default request
 
 function tokenRequest(path, method, data, loading, token) {
-	/* console.log("tokenRequest.method",method)
-	console.log('token',token) */
+	/* console.log("tokenRequest.method",method) */
+	console.log('token',token)
 	return new Promise((resolve, reject) => {
 		uni.request({
 			url: BaseUrl + path,
@@ -72,6 +74,7 @@ function tokenRequest(path, method, data, loading, token) {
 }
 
 function noTokenRequest(path, method, data, loading) {
+	console.log('notoken')
 	return new Promise((resolve, reject) => {
 		uni.request({
 			url: BaseUrl + path,
@@ -88,6 +91,7 @@ function noTokenRequest(path, method, data, loading) {
 				resolve(res.data)
 			},
 			fail: (err) => {
+					const errorMessage = err && err.errMsg ? err.errMsg : '未知错误';
 				uni.showToast({
 					title:errorMessage,
 					icon:"error",

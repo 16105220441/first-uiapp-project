@@ -163,6 +163,14 @@
 		background-color: #ffffff;
 		z-index: 99;
 	}
+	/* #ifdef APP */
+	.sticky-item{
+		position: sticky;
+		top:0;
+		background-color: #ffffff;
+		z-index: 99;
+	}
+	/* #endif */
 	uni-swiper {
 		width: 100%;
 		height: 369rpx;

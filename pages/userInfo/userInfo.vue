@@ -74,18 +74,19 @@
 		userBasicInfo.avatar = info.avatar
 	}
 
-	onBeforeMount(async ()=>{
+/* 	onBeforeMount(async ()=>{
 		console.log("onBeforeMount")
 		await getToken()
 		console.log(userBasicInfo.avatar === null)
 		console.log('isLogin',isLogin.value)
-	})
+	}) */
 	onShow(async ()=>{
 		console.log("onShow")
 
 			uni.getStorage({
 				key: 'userStore',
 				success: async (result) => {
+					console.log("JSON.parse(result.data)",JSON.parse(result.data))
           const userData = JSON.parse(result.data)
           if (userData.userToken) {
             isLogin.value = true
@@ -97,6 +98,7 @@
           userBasicInfo.mobile = ''
           userBasicInfo.pickName = ''
           userBasicInfo.avatar = ''
+		  console.log('fail')
           uni.removeTabBarBadge({ index: 2 });
 
         }

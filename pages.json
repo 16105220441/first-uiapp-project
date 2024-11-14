@@ -114,30 +114,30 @@
 		"list": [
 			{
 				"pagePath": "pages/index/index",
-				"iconPath": "/static/tabBar/首页.png",
-				"selectedIconPath": "/static/tabBar/首页1.png",
+				"iconPath": "/static/tabBar/shouye0.png",
+				"selectedIconPath": "/static/tabBar/shouye1.png",
 
 				"text": "首页"
 
 			},
 			{
 				"pagePath": "pages/category/category",
-				"iconPath": "/static/tabBar/商品分类0.png",
-				"selectedIconPath": "/static/tabBar/商品分类1.png",
+				"iconPath": "/static/tabBar/fenlei0.png",
+				"selectedIconPath": "/static/tabBar/fenlei1.png",
 				"text": "分类"
 
 			},
 			{
 				"pagePath": "pages/cart/cart",
-				"iconPath": "/static/tabBar/购物车0.png",
-				"selectedIconPath": "/static/tabBar/购物车1.png",
+				"iconPath": "/static/tabBar/gouwuche0.png",
+				"selectedIconPath": "/static/tabBar/gouwuche1.png",
 				"text": "购物车"
 
 			},
 			{
 				"pagePath": "pages/userInfo/userInfo",
-				"iconPath": "/static/tabBar/我的0.png",
-				"selectedIconPath": "/static/tabBar/我的1.png",
+				"iconPath": "/static/tabBar/wede0.png",
+				"selectedIconPath": "/static/tabBar/wede1.png",
 				"text": "我的"
 
 			}

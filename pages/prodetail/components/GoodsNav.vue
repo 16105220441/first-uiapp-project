@@ -6,10 +6,10 @@ import UniGoodsNav
 const props = defineProps(['info', 'isAddToCart'])
 let options = reactive([{
 
-  icon: '/static/tabBar/首页.png',
+  icon: '/static/tabBar/shouye0.png',
   text: '首页'
 }, {
-  icon: '/static/tabBar/购物车0.png',
+  icon: '/static/tabBar/gouwuche0.png',
   text: '购物车',
   info: props.info
 }],)

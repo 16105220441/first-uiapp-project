@@ -105,39 +105,50 @@
 </script>
 
 <template>
-
-	<view class="sticky-item">
-		<uni-search-bar placeholder="请输入搜索关键词" :radius="50" v-model="querySearch" @confirm="reSearch(querySearch)"
-			:maxlength="5">
-			<template v-slot:searchIcon>
-				<uni-icons color="#999999" size="18" type="search" @click="console.log('点击了自定义搜索图标')"></uni-icons>
-			</template>
-
-		</uni-search-bar>
-	<segmented-control ref="segmentedControl" @clickSc="onOptionChange"></segmented-control>	
-	</view>
-	<view class="content">
+	<view class="page">
+		<view class="sticky-item">
+			<uni-search-bar placeholder="请输入搜索关键词" :radius="50" v-model="querySearch" @confirm="reSearch(querySearch)"
+				:maxlength="5">
+				<template v-slot:searchIcon>
+					<uni-icons color="#999999" size="18" type="search" @click="console.log('点击了自定义搜索图标')"></uni-icons>
+				</template>
 		
-		<uni-row v-for="(item,index) in proList" :key="index">
-			<navigator :url="`/pages/prodetail/prodetail?productId=${item.productId}`"  open-type="navigate">
-				<goods-item :data-item="item"></goods-item>
-			</navigator>
+			</uni-search-bar>
+		<segmented-control ref="segmentedControl" @clickSc="onOptionChange"></segmented-control>	
+		</view>
+		<view class="content">
 			
-		</uni-row>
+			<uni-row v-for="(item,index) in proList" :key="index">
+				<navigator :url="`/pages/prodetail/prodetail?productId=${item.productId}`"  open-type="navigate">
+					<goods-item :data-item="item"></goods-item>
+				</navigator>
+				
+			</uni-row>
+		</view>
 	</view>
+
 	
 
 
 </template>
 
 <style lang="scss" scoped>
+	
 	.sticky-item{
 		position: sticky;
 		top:44px;
 		background-color: #ffffff;
 		z-index: 99;
 	}
+	/* #ifdef APP */
+	.sticky-item{
+		position: sticky;
+		top: 0;
+		background-color: #ffffff;
+		z-index: 99;
+	}
+	/* #endif */
 	.content{
-		margin: 0 10px;
+		padding: 0 10px;
 	}
 </style>

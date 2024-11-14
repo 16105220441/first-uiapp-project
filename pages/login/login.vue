@@ -172,18 +172,33 @@
 				});
 
 				// 存储用户信息
-				uni.setStorageSync('userStore', JSON.stringify({
-					userToken: token,
-					userId: customerId
-				}));
+				try{
+					uni.setStorageSync('userStore', JSON.stringify({
+						userToken: token,
+						userId: customerId,
+						
+					}));
+				}catch(e){
+					console.log(e)
+				}
+				
 
 				// 显示登录成功的提示
 				uni.showToast({
-					title: '登录成功',
+				    title: '登录成功',
+				    duration: 1500, // 设置显示时间
+				    icon: 'success', // 可选：设置图标类型
 					success() {
-						setTimeout(() => uni.navigateBack(), 1500);
+						 console.log('login');
 					}
 				});
+				
+				// 使用 setTimeout 延迟跳转
+				setTimeout(() => {
+				   
+				    uni.navigateBack();
+				}, 1500);
+
 			}
 		} catch (err) {
 			console.log('err', err);
